@@ -1,14 +1,22 @@
-
-function runGame() {
-
+(function runGame() {
+    // debugger;
     var display = document.getElementById('cards');
-    cards = ['A', '2','3', '4','5',"6",'7','7','8', '9', "10", 'J', 'Q', 'K']
+    var cards = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
-    function hit() {
-        var card = Math.round(Math.random() * cards.length);
-        display.innerHTML = cards[card];
-        checkResult('no', true);
+    function getCard(numOfCards) {
+        for (i = 0; i < numOfCards; i++) {
+            card = Math.floor(Math.random() * cards.length);
+            if (display.innerHTML === '') {
+                display.innerHTML = cards[card];
+            } else {
+                display.innerHTML += ' ' + cards[card];
+            }
+        }
+        setTimeout(function() {
+          checkResult(false);
+        }, 100);
     }
+
 
     /**
      * Check the result of the current cards and alert the game result
@@ -17,48 +25,57 @@ function runGame() {
      * @param  {Boolean} hitting   Whether or not the player is hitting
      * @return {void}
      */
-    function checkResult(standing, hitting) {
-        cards = display.innerHTML.split(' ');
-
-        var cardValue = 0;
-
-        cards.forEach(function (card, i) {
-            if (Number(card)) {
-                cardValue = cardValue + card;
+    function checkResult(standing) {
+        var yourHand = display.innerHTML.split(' ');
+        var playerTotal = 0;
+        yourHand.forEach(function(currentCard, i) {   // check hand total TODO: make function
+            if (Number(currentCard)) {
+                currentCard = Number(currentCard);
+                playerTotal += currentCard;
             }
 
-            if (card === 'J' || card == 'Q' || card === 'J')
-                cardValue = cardValue + 10;
+            if (currentCard === 'J' || currentCard == 'Q' || currentCard === 'K') {
+                playerTotal += 10;
+            }
 
-            if (cards[i] = 'A') { cardValue = cardValue += 11; }
-        });
+            if (currentCard === 'A') {
+                playerTotal += 11;
+            }
+        }); // end of check hand total
+        console.log("player total = " + playerTotal);
+        if (playerTotal > 21) { // player goes over
+          alert('Bust!');
+        }
 
-        if (cardValue < 15 && standing) {
+        if (playerTotal === 21) {
+          alert('Blackjack! You win!');
+        }
+
+        if (standing) {
+          if (playerTotal < 15) {
             alert('Dealer wins.');
-        }
-        if (cardValue < 18 && standing) {
+          } else if (playerTotal < 19) {
             alert('Push!');
-        }
-        if (cardValue > 18 & hitting || cardValue === 21) {
-            alert('You win!');
-        }
-        if (cardValue > 21) {
-            alert('You Bust.');
+          } else {
+            alert('Player wins!');
+          }
         }
 
-    display.innerHTML = '';
-    card = Math.round(Math.random() * cards.length);
-    display.innerHTML = cards[card];
+
+
+        // display.innerHTML = '';
+        // card = Math.floor(Math.random() * cards.length);
+        // display.innerHTML = cards[card];
     }
 
     document.getElementById('stand').addEventListener('click', function() {
-        checkREsult(true);
+        checkResult(true);
     });
 
-    document.getElementById('hit').addEventListener('click',function(){checkResult(null, true);});
+    document.getElementById('hit').addEventListener('click', function() {
+        getCard(1);
+    });
 
-    card = Math.round(Math.random() * cards.length);
-    display.innerHTML = cards[card];
-    card = Math.round(Math.random() * cards.length);
-    display.innerHTML = display.innerHTML + ' ' + cards[card];
-}
+    display.innerHTML = '';
+    getCard(2); // deal hand
+})();
